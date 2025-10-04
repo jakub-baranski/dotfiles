@@ -1,0 +1,44 @@
+ # Neovim
+nvim/.config/nvim/lazy-lock.json
+
+# Shell history and cache
+.zsh_history
+.zsh_sessions
+.zcompdump*
+*.zwc
+
+# Powerlevel10k
+.p10k.zsh
+
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Temporary files
+*.swp
+*.swo
+*~
+*.tmp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
