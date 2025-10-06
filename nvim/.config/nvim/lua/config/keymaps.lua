@@ -7,5 +7,8 @@
 -- For normal mode (command/normal mode)
 vim.keymap.set("n", "<S-Tab>", "<<", { desc = "Shift indent left" })
 
+-- Disable horizontal scrolling with mouse wheel
+vim.keymap.set("n", "<ScrollWheelRight>", "<Nop>", { desc = "Scroll right" })
+
 -- For insert mode
 vim.keymap.set("i", "<S-Tab>", "<C-d>", { desc = "Shift indent left in insert" })
