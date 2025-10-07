@@ -23,21 +23,21 @@ return {
       expr = true,
       desc = "Goto/Apply Next Edit Suggestion",
     },
-    {
-      "<leader>as",
-      function() require("sidekick.cli").toggle() end,
-      desc = "Sidekick Toggle CLI",
-    },
+    -- {
+    --   "<leader>as",
+    --   function() require("sidekick.cli").toggle() end,
+    --   desc = "Sidekick Toggle CLI",
+    -- },
     {
       "<leader>ac",
       function() require("sidekick.cli").toggle({ name = "copilot", focus = true }) end,
       desc = "Sidekick Toggle Copilot",
     },
-    -- {
-    --   "<leader>as",
-    --   function() require("sidekick.cli").select({ filter = { installed = true } }) end,
-    --   desc = "Select CLI",
-    -- },
+    {
+      "<leader>as",
+      function() require("sidekick.cli").select({ filter = { installed = true } }) end,
+      desc = "Select CLI",
+    },
     {
       "<leader>at",
       function() require("sidekick.cli").send({ msg = "{this}" }) end,
