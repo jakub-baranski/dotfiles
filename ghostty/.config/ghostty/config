@@ -88,3 +88,6 @@ window-save-state = always
 #
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
 
+
+# Cursor shaders
+custom-shader = shaders/cursor_synesthaxia(tweened).glsl
