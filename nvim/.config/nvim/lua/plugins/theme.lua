@@ -3,7 +3,29 @@ return {
     "folke/tokyonight.nvim",
     lazy = false,
     priority = 1000,
-    opts = {},
+    opts = {
+      transparent = true,
+
+      -- Make line numbers a bit more visible
+      on_highlights = function(hl, c)
+        hl.LineNrAbove = { fg = c.fg_dark }
+        hl.LineNrBelow = { fg = c.fg_dark }
+      end,
+    },
+
+    keys = {
+      {
+        -- Toggle transparency keybinding
+        "<leader>ut",
+        function()
+          require("tokyonight").setup({
+            transparent = not require("tokyonight.config").options.transparent,
+          })
+          vim.cmd("colorscheme tokyonight")
+        end,
+        desc = "Toggle Transparency",
+      },
+    },
   },
   {
     "rose-pine/neovim",

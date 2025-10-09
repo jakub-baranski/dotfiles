@@ -22,6 +22,9 @@ return {
           return status.get() ~= nil
         end,
       })
+
+      -- Configuration for tokyonight.nvim colorscheme
+      opts.theme = "tokyonight"
     end,
   },
 }
