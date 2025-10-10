@@ -64,7 +64,7 @@ macos-icon = chalkboard
 #
 theme = light:Rose Pine Dawn,dark:TokyoNight Storm
 # theme = light:Monokai Pro Light,dark:Monokai Pro Machine
-background-opacity = 0.95
+background-opacity = 0.90
 background-blur-radius = 20
 font-size = 14
 
