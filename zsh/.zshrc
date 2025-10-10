@@ -190,3 +190,4 @@ add-zsh-hook chpwd _auto_venv
 
 # Run once when shell starts
 _auto_venv
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"

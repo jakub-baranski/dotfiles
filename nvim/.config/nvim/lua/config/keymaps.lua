@@ -14,3 +14,6 @@ vim.keymap.set("n", "<S-Tab>", "<<", { desc = "Shift indent left" })
 
 -- For insert mode
 vim.keymap.set("i", "<S-Tab>", "<C-d>", { desc = "Shift indent left in insert" })
+
+-- Keep behaviour of option + backspace deleting left word in insert mode
+vim.keymap.set("i", "<M-BS>", "<C-w>", { noremap = true })
