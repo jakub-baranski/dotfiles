@@ -1,0 +1,104 @@
+" .ideavimrc is a configuration file for IdeaVim plugin. It uses
+"   the same commands as the original .vimrc configuration.
+" You can find a list of commands here: https://jb.gg/h38q75
+" Find more examples here: https://jb.gg/share-ideavimrc
+
+" Source your .vimrc
+source ~/.vimrc
+
+set clipboard+=unnamed
+set peekaboo
+set NERDTree
+Plug 'tpope/vim-surround'
+" Highlight copied text
+Plug 'machakann/vim-highlightedyank'
+" Commentary plugin
+Plug 'tpope/vim-commentary'
+
+" Show a few lines of context around the cursor. Note that this makes the
+" text scroll if you mouse-click near the start or end of the window.
+set scrolloff=5
+
+" Do incremental searching.
+set incsearch
+
+" Clear search highlighting with return
+nnoremap <Return> :nohlsearch<cr>
+
+" Don't use Ex mode, use Q for formatting.
+map Q gq
+
+" --- Enable IdeaVim plugins https://jb.gg/ideavim-plugins
+
+set number rnu
+
+" nnoremap <SPACE> <Nop>
+
+:let mapleader = " "
+
+
+nnoremap <c-z> :action ToggleDistractionFreeMode<CR>
+
+" Splitting shortcuts
+
+nnoremap <leader>\| :action SplitVertically<CR>
+nnoremap <leader>- :action SplitHorizontally<CR>
+nnoremap <leader>= :action Unsplit<CR>
+
+" files and searching
+nnoremap <leader><leader> :action SearchEverywhere<CR>
+nnoremap <leader>ff :action SearchEverywhere<CR>
+
+nnoremap <leader>fb :action Switcher<CR>
+nnoremap <leader>, :action RecentLocations<CR>
+nnoremap <leader>fr :action RecentFiles<CR>
+nnoremap <leader>sg :action FindInPath<CR>
+nnoremap <leader>/ :action FindInPath<CR>
+nnoremap <leader>fe :NERDTree<CR>
+nnoremap <leader>e :NERDTree<CR>
+
+" buffers and tabs
+nnoremap <leader>bn :action NextTab<CR>
+nnoremap <leader>bp :action PreviousTab<CR>
+
+nnoremap <leader>bd :action CloseContent<CR>
+nnoremap <leader>wq :action CloseContent<CR>
+nnoremap <leader>wo :action CloseAllEditorsButActive<CR>
+nnoremap <leader>wa :action CloseAllEditors<CR>
+nnoremap <leader>bo :action CloseAllEditorsButActive<CR>
+
+" Terminal
+
+nnoremap <C-/> :action ActivateTerminalToolWindow<CR>
+
+
+" code actions
+nnoremap <leader>ca :action ShowIntentionActions<CR>
+nnoremap <leader>cd :action ShowErrorDescription<CR>
+nnoremap <leader>cf :action ReformatCode<CR>
+nnoremap <leader>cr :action RenameElement<CR>
+
+" Lsp navigation - is that working??
+nnoremap gd :action GotoDeclaration<CR>
+nnoremap gy :action GotoTypeDeclaration<CR>
+
+" Next / previous navigation
+nnoremap ]m :action MethodDown<CR>
+nnoremap [m :action MethodUp<CR>
+nnoremap [d :action GotoPreviousError<CR>
+nnoremap ]d :action GotoNextError<CR>
+
+" Git mappings
+nnoremap <leader>gg :action ActivateVersionControlToolWindow<CR>
+
+" I would like that to be "show references" but Idea works a bit differently and GotoDeclaration is contextual,
+"  so it will show references when appropriate. Find usages is not convenient enough because it opens a panel.
+nnoremap gr :action GotoDeclaration<CR>
+nnoremap <leader>uz :action ToggleZenMode<CR>
+
+" Debugging
+
+nnoremap <leader>db :action ToggleLineBreakpoint<CR>
+nnoremap <leader>dc :action Debug<CR>
+nnoremap <leader>du :action UiDebugger<CR>
+
