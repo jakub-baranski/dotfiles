@@ -6,10 +6,13 @@ return {
     opts = {
       transparent = true,
 
-      -- Make line numbers a bit more visible
       on_highlights = function(hl, c)
+        -- Make line numbers a bit more visible
         hl.LineNrAbove = { fg = c.fg_dark }
         hl.LineNrBelow = { fg = c.fg_dark }
+
+        -- Same thing for split separators
+        hl.WinSeparator = { fg = c.fg_dark }
       end,
     },
 
