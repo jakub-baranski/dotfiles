@@ -67,6 +67,20 @@ nnoremap <leader>wo :action CloseAllEditorsButActive<CR>
 nnoremap <leader>wa :action CloseAllEditors<CR>
 nnoremap <leader>bo :action CloseAllEditorsButActive<CR>
 
+" Easier navigation between panes
+nnoremap <leader>wh <C-w>h
+nnoremap <leader>wj <C-w>j
+nnoremap <leader>wk <C-w>k
+nnoremap <leader>wl <C-w>l
+
+" Moving code around vim style
+" Move code using h/j/k/l rather than IntelliJ's keybindings that uses arrow keys
+
+map <A-j> <Action>(MoveLineDown)
+map <A-S-j> <Action>(MoveStatementDown)
+map <A-k> <Action>(MoveLineUp)
+map <A-S-k> <Action>(MoveStatementUp)
+
 " Terminal
 
 nnoremap <C-/> :action ActivateTerminalToolWindow<CR>
