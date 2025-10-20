@@ -85,8 +85,11 @@ link-url = true
 window-save-state = always
 
 # Quick Terminal
-#
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
+
+
+# Clear terminal - send text instead of clear_screen - This way it works in tmux.
+keybind = command+k=text:\x0c
 
 
 # Cursor shaders

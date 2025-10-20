@@ -14,6 +14,8 @@ Plug 'tpope/vim-surround'
 Plug 'machakann/vim-highlightedyank'
 " Commentary plugin
 Plug 'tpope/vim-commentary'
+" Long range motion with s + two characters
+Plug 'justinmk/vim-sneak'
 
 " Show a few lines of context around the cursor. Note that this makes the
 " text scroll if you mouse-click near the start or end of the window.
@@ -81,6 +83,7 @@ map <A-S-j> <Action>(MoveStatementDown)
 map <A-k> <Action>(MoveLineUp)
 map <A-S-k> <Action>(MoveStatementUp)
 
+
 " Terminal
 
 nnoremap <C-/> :action ActivateTerminalToolWindow<CR>
@@ -109,6 +112,7 @@ nnoremap <leader>gg :action ActivateVersionControlToolWindow<CR>
 "  so it will show references when appropriate. Find usages is not convenient enough because it opens a panel.
 nnoremap gr :action GotoDeclaration<CR>
 nnoremap <leader>uz :action ToggleZenMode<CR>
+nnoremap <leader>uZ :action MaximizeEditorInSplit<CR>
 
 " Debugging
 

@@ -1,3 +1,6 @@
+# Uncomment to use the profiling module
+# zmodload zsh/zprof
+
 # ====================================================================================================================================================== 
 #
 # POWERLEVEL10K CONFIGURATION
@@ -9,41 +12,56 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-
-# Uncomment to use the profiling module
-# zmodload zsh/zprof
-
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
-
 
 # Don't clutter $HOME with completion dumps
 export ZSH_COMPDUMP=$ZSH/cache/.zcompdump-$HOST
 
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# ZSH Plugins
+# ======================================================================================================================================================
 #
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
+# COMPLETION SETUP - MUST BE BEFORE OH-MY-ZSH
+
+# Docker completions
+fpath=($HOME/.docker/completions $fpath)
+
+# Skip compinit during Oh-My-Zsh load - we'll do it ourselves (avoids double init)
+skip_global_compinit=1
+
+# ======================================================================================================================================================
+#
+# ZSH PLUGINS
+
 plugins=(
   git 
-  aliases 
   colored-man-pages 
-  colorize 
-  dircycle
   zsh-autosuggestions
-  extract
   docker
-  brew
   zsh-vi-mode
 )
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
+# ======================================================================================================================================================
+#
+# OPTIMIZED COMPLETION INITIALIZATION
+
+autoload -Uz compinit
+
+# Only regenerate compdump once per day
+# -C flag skips the security check (compaudit) for cached files
+for dump in ${ZSH_COMPDUMP}(Nm+1); do
+  compinit -d "$ZSH_COMPDUMP"
+  break
+done
+
+compinit -C -d "$ZSH_COMPDUMP"
+
+# ======================================================================================================================================================
+#
+# USER CONFIGURATION
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
@@ -52,71 +70,41 @@ else
   export EDITOR='nvim'
 fi
 
-
-
-# ======================================================================================================================================================
-
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-
-
 # LANG
 export LC_ALL=en_US.UTF-8
 
-# aliases
+# Pyenv (lazy-loaded for faster startup)
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 
-alias ccat='pygmentize'
-alias cat='bat -pp'  # Alias for cat, to bat, but only for coloring. 
+# Lazy load pyenv - it will initialize on first use
+pyenv() {
+  unfunction pyenv
+  eval "$(command pyenv init -)"
+  pyenv "$@"
+}
+
+# PostgreSQL
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+
+# ======================================================================================================================================================
+#
+# ALIASES
+#
+
+alias cat='bat -pp'
+alias rcat='/bin/cat'
 alias zshreload='source ~/.zshrc'
 alias zshconfig='$EDITOR ~/.zshrc'
 alias myip='curl -s https://ipinfo.io/ip'
 alias ls='eza'
-
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+alias view='nvim -R'
 
 # ======================================================================================================================================================
 #
-# VIM mode
+# HISTORY CONFIGURATION
 #
-# Fixes Mac OS option + delete in insert mode
-bindkey -M viins '\e^?' backward-kill-word
 
-# ======================================================================================================================================================
-#
-# FZF CONFIGURATION
-#
-source <(fzf --zsh)
-
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# FZF theme configuration
-
-export FZF_DEFAULT_OPTS=" \
---color=bg+:#CCD0DA,spinner:#DC8A78,hl:#D20F39 \
---color=header:#D20F39,info:#8839EF,pointer:#DC8A78 \
---color=marker:#7287FD,fg+:#4C4F69,prompt:#8839EF,hl+:#D20F39 \
---color=selected-bg:#BCC0CC \
---color=border:#9CA0B0,label:#4C4F69 \
---walker file,hidden
-"
-
-
-# ======================================================================================================================================================
-#
-# DOCKER COMPLETIONS
-
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=($HOME/.docker/completions $fpath)
-autoload -Uz compinit
-
-compinit
-
-# ======================================================================================================================================================
-
-# Better history
 HISTSIZE=50000
 SAVEHIST=50000
 setopt HIST_IGNORE_DUPS
@@ -125,41 +113,73 @@ setopt HIST_IGNORE_SPACE
 setopt HIST_SAVE_NO_DUPS
 setopt SHARE_HISTORY
 
+# ======================================================================================================================================================
+#
+# COMPLETION SETTINGS
+#
 
-
-# Better completion
 setopt AUTO_CD
 setopt CORRECT
 setopt MENU_COMPLETE
 
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
+# ======================================================================================================================================================
+#
+# VIM MODE
+#
+
+# Fixes Mac OS option + delete in insert mode
+bindkey -M viins '\e^?' backward-kill-word
+
+# ======================================================================================================================================================
+#
+# FZF CONFIGURATION
+#
+
+# FZF theme configuration
+export FZF_DEFAULT_OPTS=" \
+--color=bg+:#CCD0DA,spinner:#DC8A78,hl:#D20F39 \
+--color=header:#D20F39,info:#8839EF,pointer:#DC8A78 \
+--color=marker:#7287FD,fg+:#4C4F69,prompt:#8839EF,hl+:#D20F39 \
+--color=selected-bg:#BCC0CC \
+--color=border:#9CA0B0,label:#4C4F69 \
+--walker file,hidden \
+"
+
+alias fzfp='fzf --preview="bat --style=numbers --color=always --line-range :500 {}"'
 
 # Fix fzf history search with zsh-vi-mode
 function zvm_after_init() {
-  # Restore fzf key bindings
   source <(fzf --zsh)
 }
 
 # ======================================================================================================================================================
-# AUTO VIRTUALENV ACTIVATION/DEACTIVATION
-# Automatically activates a Python virtual environment when you `cd` into a directory
 #
+# SYNTAX HIGHLIGHTING
+#
+
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# ======================================================================================================================================================
+#
+# AUTO VIRTUALENV ACTIVATION/DEACTIVATION
+#
+
 # Function to find virtualenv in current or parent directories
 _find_venv() {
     local dir="$PWD"
-    while [[ "$dir" != "/" ]]; do
-        if [[ -f "$dir/venv/bin/activate" ]]; then
-            echo "$dir/venv"
-            return 0
-        elif [[ -f "$dir/.venv/bin/activate" ]]; then
-            echo "$dir/.venv"
-            return 0
-        elif [[ -f "$dir/env/bin/activate" ]]; then
-            echo "$dir/env"
-            return 0
-        fi
+    local depth=0
+    # Limit search depth to 3 levels max for performance
+    while [[ "$dir" != "/" && $depth -lt 3 ]]; do
+        for venv_dir in venv .venv env; do
+            if [[ -f "$dir/$venv_dir/bin/activate" ]]; then
+                echo "$dir/$venv_dir"
+                return 0
+            fi
+        done
         dir="$(dirname "$dir")"
+        ((depth++))
     done
     return 1
 }
@@ -190,4 +210,14 @@ add-zsh-hook chpwd _auto_venv
 
 # Run once when shell starts
 _auto_venv
-export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+
+# ======================================================================================================================================================
+#
+# POWERLEVEL10K PROMPT
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# ======================================================================================================================================================
+# Uncomment to see profiling results
+# zprof

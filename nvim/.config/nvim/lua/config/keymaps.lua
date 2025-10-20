@@ -23,3 +23,15 @@ vim.keymap.set("n", "<leader>yp", function()
   vim.fn.setreg("+", filepath)
   print("Yanked to clipboard: " .. filepath)
 end, { noremap = true, silent = true, desc = "Yank buffer path to clipboard" })
+
+-- Keybind to turn on and off colorcolumn
+
+vim.keymap.set("n", "<leader>u2c", function()
+  if vim.wo.colorcolumn == "" then
+    vim.wo.colorcolumn = "100"
+    print("Colorcolumn enabled at 100")
+  else
+    vim.wo.colorcolumn = ""
+    print("Colorcolumn disabled")
+  end
+end, { noremap = true, silent = true, desc = "Toggle colorcolumn at 100" })

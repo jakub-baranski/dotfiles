@@ -19,7 +19,7 @@ return {
     keys = {
       {
         -- Toggle transparency keybinding
-        "<leader>ut",
+        "<leader>u2t",
         function()
           require("tokyonight").setup({
             transparent = not require("tokyonight.config").options.transparent,
@@ -29,14 +29,6 @@ return {
         desc = "Toggle Transparency",
       },
     },
-  },
-  {
-    "rose-pine/neovim",
-    enabled = false,
-    name = "rose-pine",
-    config = function()
-      vim.cmd("colorscheme rose-pine")
-    end,
   },
   {
     "f-person/auto-dark-mode.nvim",
