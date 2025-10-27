@@ -8,7 +8,10 @@ source ~/.vimrc
 
 set clipboard+=unnamed
 set peekaboo
+set ideajoin
 set NERDTree
+set which-key
+set notimeout
 Plug 'tpope/vim-surround'
 " Highlight copied text
 Plug 'machakann/vim-highlightedyank'
@@ -26,9 +29,6 @@ set incsearch
 
 " Clear search highlighting with return
 nnoremap <Return> :nohlsearch<cr>
-
-" Don't use Ex mode, use Q for formatting.
-map Q gq
 
 " --- Enable IdeaVim plugins https://jb.gg/ideavim-plugins
 
@@ -94,6 +94,7 @@ nnoremap <leader>ca :action ShowIntentionActions<CR>
 nnoremap <leader>cd :action ShowErrorDescription<CR>
 nnoremap <leader>cf :action ReformatCode<CR>
 nnoremap <leader>cr :action RenameElement<CR>
+nnoremap <leader>cm :action Move<CR>
 
 " Lsp navigation - is that working??
 nnoremap gd :action GotoDeclaration<CR>
@@ -107,6 +108,13 @@ nnoremap ]d :action GotoNextError<CR>
 
 " Git mappings
 nnoremap <leader>gg :action ActivateVersionControlToolWindow<CR>
+nnoremap <leader>gb :action Annotate<CR>
+nnoremap <leader>gc :action CheckinProject<CR>
+nnoremap <leader>gp :action Vcs.Push<CR>
+nnoremap <leader>gd :action Compare.SameVersion<CR>
+nnoremap <leader>gs :action Vcs.Show.Local.Changes<CR>
+nnoremap <leader>gl :action Vcs.Show.Log<CR>
+
 
 " I would like that to be "show references" but Idea works a bit differently and GotoDeclaration is contextual,
 "  so it will show references when appropriate. Find usages is not convenient enough because it opens a panel.
@@ -120,3 +128,29 @@ nnoremap <leader>db :action ToggleLineBreakpoint<CR>
 nnoremap <leader>dc :action Debug<CR>
 nnoremap <leader>du :action UiDebugger<CR>
 
+" Running
+" Similar to Overseer Run from my Neovim keybinds
+nnoremap <leader>or :action RunAnything<CR>
+nnoremap <leader>oc :action RunClass<CR>
+
+" Surround - add mappings to make it also work like mini.surround (with g prefix - to not conflict with sneak)
+
+let g:WhichKeyDesc_surround = "gs  Surround"
+let g:WhichKeyDesc_surround_add = "gsa  Add surrounding"
+let g:WhichKeyDesc_surround_delete = "gsd  Delete surrounding"
+let g:WhichKeyDesc_surround_replace = "gsr  Replace surrounding"
+
+nmap gsa ys
+vmap gsa S
+
+" Delete surrounding - 'sd' (mini.surround uses 'sd{char}')
+nmap gsd ds
+
+" Replace surrounding - 'sr' (mini.surround uses 'sr{old}{new}')
+nmap gsr cs
+
+" Add surrounding to current line (like 'saa' in mini.surround)
+nmap gsaa yss
+
+" Add surrounding to word (like 'saw' in mini.surround for current word)
+nmap gsaw ysiw

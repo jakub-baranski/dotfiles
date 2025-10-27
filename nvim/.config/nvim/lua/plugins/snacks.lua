@@ -111,5 +111,15 @@ return {
 
       return opts
     end,
+
+    keys = {
+      {
+        "<leader><space>",
+        function()
+          Snacks.picker.smart()
+        end,
+        desc = "Smart Find Files",
+      },
+    },
   },
 }
