@@ -62,8 +62,12 @@ macos-icon = chalkboard
  
 # Theme
 #
-theme = light:Rose Pine Dawn,dark:TokyoNight Storm
+# theme = light:Rose Pine Dawn,dark:TokyoNight Storm
+theme = light:Catppuccin Latte,dark:TokyoNight Storm
+
 # theme = light:Monokai Pro Light,dark:Monokai Pro Machine
+
+
 background-opacity = 0.90
 background-blur-radius = 20
 font-size = 14
@@ -95,4 +99,4 @@ keybind = command+k=text:\x0c
 # Cursor shaders
 # custom-shader = shaders/cursor_synesthaxia(tweened).glsl
 # custom-shader = shaders/blaze_sparks.glsl
-# custom-shader = shaders/cursor_smear.glsl
+custom-shader = shaders/neovide_like.glsl

@@ -73,16 +73,14 @@ fi
 # LANG
 export LC_ALL=en_US.UTF-8
 
-# Pyenv (lazy-loaded for faster startup)
 export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$PYENV_ROOT/bin:$PATH"
 
-# Lazy load pyenv - it will initialize on first use
-pyenv() {
-  unfunction pyenv
-  eval "$(command pyenv init -)"
-  pyenv "$@"
-}
+# Initialize pyenv properly
+if command -v pyenv >/dev/null 2>&1; then
+  eval "$(pyenv init --path)"
+  eval "$(pyenv init -)"
+fi
 
 # NVM
 export NVM_DIR="$HOME/.nvm"

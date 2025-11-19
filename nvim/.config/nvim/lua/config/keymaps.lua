@@ -18,6 +18,14 @@ vim.keymap.set("i", "<S-Tab>", "<C-d>", { desc = "Shift indent left in insert" }
 -- Keep behaviour of option + backspace deleting left word in insert mode
 vim.keymap.set("i", "<M-BS>", "<C-w>", { noremap = true })
 
+-- Window switching navigation
+vim.keymap.set("n", "<M-j>", "<Cmd>NvimTmuxNavigateDown<CR>", { silent = true })
+vim.keymap.set("n", "<M-k>", "<Cmd>NvimTmuxNavigateUp<CR>", { silent = true })
+vim.keymap.set("n", "<M-l>", "<Cmd>NvimTmuxNavigateRight<CR>", { silent = true })
+vim.keymap.set("n", "<M-h>", "<Cmd>NvimTmuxNavigateLeft<CR>", { silent = true })
+vim.keymap.set("n", "<M-\\>", "<Cmd>NvimTmuxNavigateLastActive<CR>", { silent = true })
+vim.keymap.set("n", "<C-Space>", "<Cmd>NvimTmuxNavigateNext<CR>", { silent = true })
+
 vim.keymap.set("n", "<leader>yp", function()
   local filepath = vim.fn.expand("%:p")
   vim.fn.setreg("+", filepath)

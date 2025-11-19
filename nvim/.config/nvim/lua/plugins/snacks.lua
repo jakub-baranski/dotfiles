@@ -10,6 +10,7 @@ return {
         },
       }
       opts.picker = {
+        ui_select = true,
         win = {
           preview = {
             wo = {

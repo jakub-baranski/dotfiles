@@ -15,20 +15,6 @@ return {
         hl.WinSeparator = { fg = c.fg_dark }
       end,
     },
-
-    keys = {
-      {
-        -- Toggle transparency keybinding
-        "<leader>u2t",
-        function()
-          require("tokyonight").setup({
-            transparent = not require("tokyonight.config").options.transparent,
-          })
-          vim.cmd("colorscheme tokyonight")
-        end,
-        desc = "Toggle Transparency",
-      },
-    },
   },
   {
     "f-person/auto-dark-mode.nvim",
@@ -39,7 +25,7 @@ return {
       end,
       set_light_mode = function()
         vim.api.nvim_set_option_value("background", "light", {})
-        vim.cmd("colorscheme tokyonight-day")
+        vim.cmd("colorscheme catppuccin-latte")
       end,
       update_interval = 3000,
       fallback = "dark",

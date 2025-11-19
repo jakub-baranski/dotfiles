@@ -12,6 +12,7 @@ set ideajoin
 set NERDTree
 set which-key
 set notimeout
+set guicursor=n-v-c:block,i-ci-ve:ver25
 Plug 'tpope/vim-surround'
 " Highlight copied text
 Plug 'machakann/vim-highlightedyank'
@@ -105,6 +106,8 @@ nnoremap ]m :action MethodDown<CR>
 nnoremap [m :action MethodUp<CR>
 nnoremap [d :action GotoPreviousError<CR>
 nnoremap ]d :action GotoNextError<CR>
+nnoremap ]h :action VcsShowNextChangeMarker<CR>
+nnoremap [h :action VcsShowPrevChangeMarker<CR>
 
 " Git mappings
 nnoremap <leader>gg :action ActivateVersionControlToolWindow<CR>

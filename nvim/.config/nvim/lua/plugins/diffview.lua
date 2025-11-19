@@ -9,4 +9,11 @@ return {
       use_icons = true,
     })
   end,
+  keys = {
+    {
+      "<leader>gv",
+      "<cmd>DiffviewOpen<cr>",
+      desc = "Open Diffview",
+    },
+  },
 }

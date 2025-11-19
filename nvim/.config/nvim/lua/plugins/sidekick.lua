@@ -8,6 +8,11 @@ return {
           backend = "tmux",
           enabled = true,
         },
+        win = {
+          split = {
+            width = 60,
+          },
+        },
       },
     },
   -- stylua: ignore
