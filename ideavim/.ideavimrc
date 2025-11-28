@@ -65,16 +65,18 @@ nnoremap <leader>bn :action NextTab<CR>
 nnoremap <leader>bp :action PreviousTab<CR>
 
 nnoremap <leader>bd :action CloseContent<CR>
-nnoremap <leader>wq :action CloseContent<CR>
-nnoremap <leader>wo :action CloseAllEditorsButActive<CR>
-nnoremap <leader>wa :action CloseAllEditors<CR>
+nnoremap <leader>wq :action CloseAllEditors<CR>
+nnoremap <leader>wo :action UnsplitAll<CR>
 nnoremap <leader>bo :action CloseAllEditorsButActive<CR>
+nnoremap <leader>ba :action CloseAllEditors<CR>
 
 " Easier navigation between panes
 nnoremap <leader>wh <C-w>h
+nnoremap <M-h> <C-w>h
 nnoremap <leader>wj <C-w>j
 nnoremap <leader>wk <C-w>k
 nnoremap <leader>wl <C-w>l
+nnoremap <M-l> <C-w>l
 
 " Moving code around vim style
 " Move code using h/j/k/l rather than IntelliJ's keybindings that uses arrow keys
