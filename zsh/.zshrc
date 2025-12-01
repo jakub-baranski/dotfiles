@@ -141,13 +141,14 @@ bindkey -M viins '\e^?' backward-kill-word
 
 # FZF theme configuration
 export FZF_DEFAULT_OPTS=" \
---color=bg+:#CCD0DA,spinner:#DC8A78,hl:#D20F39 \
---color=header:#D20F39,info:#8839EF,pointer:#DC8A78 \
---color=marker:#7287FD,fg+:#4C4F69,prompt:#8839EF,hl+:#D20F39 \
---color=selected-bg:#BCC0CC \
---color=border:#9CA0B0,label:#4C4F69 \
+--color=bg+:#363A4F,bg:#24273A,spinner:#F4DBD6,hl:#ED8796 \
+--color=fg:#CAD3F5,header:#ED8796,info:#C6A0F6,pointer:#F4DBD6 \
+--color=marker:#B7BDF8,fg+:#CAD3F5,prompt:#C6A0F6,hl+:#ED8796 \
+--color=selected-bg:#494D64 \
+--color=border:#6E738D,label:#CAD3F5 \
+--style=full \
 --walker file,hidden \
-"
+ " 
 
 alias fzfp='fzf --preview="bat --style=numbers --color=always --line-range :500 {}"'
 
