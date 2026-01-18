@@ -10,3 +10,11 @@ vim.opt.scrolloff = 8
 vim.opt.colorcolumn = "100"
 
 vim.cmd("set completeopt+=noselect")
+--
+vim.diagnostic.config({
+  float = {
+    wrap = true,
+    border = "rounded",
+    max_width = 100,
+  },
+})
