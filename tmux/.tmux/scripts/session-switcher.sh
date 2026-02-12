@@ -20,7 +20,6 @@ preview_cmd='tmux capture-pane -ep -t {1}:'
 selected=$(get_sessions | format_sessions |
   fzf --reverse \
     --style=full \
-    --color=fg:#CAD3F5,header:#ED8796,info:#C6A0F6,pointer:#F4DBD6 \
     --header='<C-x>: Kill | <C-r>: Rename | <C-n>: New' \
     --border-label=' Select a tmux session ' \
     --bind="$kill_binding" \

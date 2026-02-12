@@ -4,10 +4,6 @@
   "small_model": "github-copilot/gpt-4.1",
   "username": "jakub-baranski",
   "theme": "catppuccin-macchiato",
-  "compaction": {
-    "auto": false,
-    "prune": true
-  },
   "agent": {
     "explore": {
       "model": "github-copilot/gpt-5-mini"
