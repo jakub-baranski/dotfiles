@@ -5,7 +5,7 @@ return {
       default = { "lsp", "path", "snippets", "buffer" },
       providers = {
         snippets = {
-          score_offset = 100, -- Higher score = higher priority
+          -- score_offset = 100, -- Higher score = higher priority
         },
       },
     },
