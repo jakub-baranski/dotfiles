@@ -28,6 +28,8 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 fpath=($HOME/.docker/completions $fpath)
 
 # Skip compinit during Oh-My-Zsh load - we'll do it ourselves (avoids double init)
+# Tell OMZ to skip its own compinit
+ZSH_DISABLE_COMPFIX=true
 skip_global_compinit=1
 
 # ======================================================================================================================================================
@@ -43,21 +45,6 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
-
-# ======================================================================================================================================================
-#
-# OPTIMIZED COMPLETION INITIALIZATION
-
-autoload -Uz compinit
-
-# Only regenerate compdump once per day
-# -C flag skips the security check (compaudit) for cached files
-for dump in ${ZSH_COMPDUMP}(Nm+1); do
-  compinit -d "$ZSH_COMPDUMP"
-  break
-done
-
-compinit -C -d "$ZSH_COMPDUMP"
 
 # ======================================================================================================================================================
 #
@@ -84,7 +71,9 @@ fi
 
 # NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+nvm() { unset -f nvm; [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; nvm "$@"; }
+node() { unset -f node npm npx; [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; node "$@"; }
 
 # PostgreSQL
 export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
@@ -166,49 +155,43 @@ source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # AUTO VIRTUALENV ACTIVATION/DEACTIVATION
 #
 
-# Function to find virtualenv in current or parent directories
 _find_venv() {
     local dir="$PWD"
     local depth=0
-    # Limit search depth to 3 levels max for performance
+    VENV_PATH=""
     while [[ "$dir" != "/" && $depth -lt 3 ]]; do
         for venv_dir in venv .venv env; do
             if [[ -f "$dir/$venv_dir/bin/activate" ]]; then
-                echo "$dir/$venv_dir"
+                VENV_PATH="$dir/$venv_dir"
                 return 0
             fi
         done
-        dir="$(dirname "$dir")"
+        dir="${dir:h}"
         ((depth++))
     done
     return 1
 }
 
-# Function to auto-activate/deactivate virtualenv
 _auto_venv() {
-    local venv_path=$(_find_venv)
-    
-    # If we found a venv and it's not the currently active one
-    if [[ -n "$venv_path" ]]; then
-        if [[ "$VIRTUAL_ENV" != "$venv_path" ]]; then
-            # Deactivate current venv if one is active
-            if [[ -n "$VIRTUAL_ENV" ]]; then
-                deactivate
-            fi
-            # Activate the new venv
-            source "$venv_path/bin/activate"
+    # Still inside the same project, nothing to do
+    if [[ -n "$VIRTUAL_ENV" && "$PWD" == "${VIRTUAL_ENV:h:h}"* ]]; then
+        return
+    fi
+
+    _find_venv
+
+    if [[ -n "$VENV_PATH" ]]; then
+        if [[ "$VIRTUAL_ENV" != "$VENV_PATH" ]]; then
+            [[ -n "$VIRTUAL_ENV" ]] && deactivate
+            source "$VENV_PATH/bin/activate"
         fi
-    # If no venv found but one is active, deactivate it
     elif [[ -n "$VIRTUAL_ENV" ]]; then
         deactivate
     fi
 }
 
-# Hook the function to directory changes
 autoload -U add-zsh-hook
 add-zsh-hook chpwd _auto_venv
-
-# Run once when shell starts
 _auto_venv
 
 # ======================================================================================================================================================
