@@ -50,6 +50,10 @@ set number rnu
 
 nnoremap <c-z> :action ToggleDistractionFreeMode<CR>
 
+" paste
+
+nnoremap <leader>p :action PasteMultiple<CR>
+
 " Splitting shortcuts
 
 nnoremap <leader>\| :action SplitVertically<CR>

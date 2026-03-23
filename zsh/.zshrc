@@ -69,11 +69,9 @@ if command -v pyenv >/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
 
-# NVM
-export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-nvm() { unset -f nvm; [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; nvm "$@"; }
-node() { unset -f node npm npx; [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"; node "$@"; }
+# FNM - faster NVM - https://github.com/Schniz/fnm
+eval "$(fnm env --use-on-cd)"
+
 
 # PostgreSQL
 export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
