@@ -1,0 +1,15 @@
+[[mgr.prepend_keymap]]
+on  = "y"
+desc = "Yank selected files (copy) and copy paths to clipboard"
+run = [
+  "shell -- ~/.config/yazi/scripts/yank_path.sh %s",
+  "yank"
+]
+
+[[mgr.prepend_keymap]]
+on  = "Y"
+desc = "Yank the content of the current file"
+run = [
+  "shell -- ~/.config/yazi/scripts/yank_content.sh %s",
+  "yank"
+]

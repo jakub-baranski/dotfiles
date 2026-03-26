@@ -192,6 +192,9 @@ autoload -U add-zsh-hook
 add-zsh-hook chpwd _auto_venv
 _auto_venv
 
+
+export PATH="$HOME/.local/bin:$PATH"
+
 # ======================================================================================================================================================
 #
 # POWERLEVEL10K PROMPT

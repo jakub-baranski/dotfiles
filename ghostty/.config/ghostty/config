@@ -53,6 +53,8 @@
 # resize-overlay-duration = 4s 200ms
 
 font-family = Jetbrains Mono
+font-thicken = true
+font-thicken-strength = 200
 
 # MacOS settings
 #

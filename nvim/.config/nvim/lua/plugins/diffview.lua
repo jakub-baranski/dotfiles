@@ -15,5 +15,15 @@ return {
       "<cmd>DiffviewOpen<cr>",
       desc = "Open Diffview",
     },
+    {
+      "<leader><tab>n",
+      "<cmd>tabnext<cr>",
+      desc = "Next Tab",
+    },
+    {
+      "<leader><tab>p",
+      "<cmd>tabprevious<cr>",
+      desc = "Previous Tab",
+    },
   },
 }

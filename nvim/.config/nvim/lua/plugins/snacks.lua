@@ -16,6 +16,9 @@ return {
             wo = {
               wrap = true,
             },
+            keys = {
+              ["<CR>"] = "confirm",
+            },
           },
         },
       }
