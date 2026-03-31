@@ -6,6 +6,9 @@ return {
       "sindrets/diffview.nvim", -- optional - Diff integration
       "folke/snacks.nvim", -- optional
     },
+    opts = {
+      treesitter_diff_highlight = true,
+    },
     keys = {
       {
         "<leader>gg",

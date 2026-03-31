@@ -54,7 +54,7 @@
 
 font-family = Jetbrains Mono
 font-thicken = true
-font-thicken-strength = 200
+
 
 # MacOS settings
 #
@@ -70,7 +70,7 @@ theme = light:Catppuccin Latte,dark:TokyoNight Storm
 # theme = light:Monokai Pro Light,dark:Monokai Pro Machine
 
 
-background-opacity = 0.90
+background-opacity = 0.98
 background-blur-radius = 20
 font-size = 14
 

@@ -61,7 +61,23 @@ Press Ctrl-a + I (capital i) to install plugins
 ```
 
 
-### 4. Install a Nerd Font
+### 3. Install a Nerd Font
 For proper icon display in terminal and editor:
 ```bash
 brew install --cask font-jetbrains-mono-nerd-font
+```
+
+
+# Add New Configuration
+
+To add a new config, create a directory mirroring the path from `$HOME`:
+
+```bash
+# Example: adding config for "foo" that lives at ~/.config/foo/foo.conf
+mkdir -p foo/.config/foo
+mv ~/.config/foo/foo.conf foo/.config/foo/foo.conf
+
+# Symlink it
+stow foo
+
+The directory name (e.g. `foo`) becomes the stow package name. Everything inside it is symlinked relative to `$HOME`.

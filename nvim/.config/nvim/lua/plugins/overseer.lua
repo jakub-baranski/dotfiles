@@ -1,7 +1,14 @@
 return {
   {
     "stevearc/overseer.nvim",
-    opts = {},
+    opts = {
+      task_list = {
+        direction = "bottom",
+        sort = function(a, b)
+          return a.id > b.id
+        end,
+      },
+    },
     keys = {
       {
         "<leader>ot",

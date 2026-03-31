@@ -18,3 +18,5 @@ vim.diagnostic.config({
     max_width = 100,
   },
 })
+
+vim.g.trouble_lualine = false
