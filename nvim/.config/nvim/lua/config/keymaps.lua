@@ -43,3 +43,5 @@ vim.keymap.set("n", "<leader>u2c", function()
     print("Colorcolumn disabled")
   end
 end, { noremap = true, silent = true, desc = "Toggle colorcolumn at 100" })
+
+vim.keymap.set("n", "<leader>U", require("custom.undotree").toggle)

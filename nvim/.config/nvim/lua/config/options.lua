@@ -20,3 +20,6 @@ vim.diagnostic.config({
 })
 
 vim.g.trouble_lualine = false
+
+-- Undotree
+vim.cmd("packadd nvim.undotree")
