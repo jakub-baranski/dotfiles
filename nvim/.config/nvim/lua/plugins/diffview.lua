@@ -1,5 +1,7 @@
 return {
   "sindrets/diffview.nvim",
+  -- Include commands for lazy loading
+  cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles", "DiffviewFileHistory" },
   dependencies = {
     "nvim-lua/plenary.nvim",
   },

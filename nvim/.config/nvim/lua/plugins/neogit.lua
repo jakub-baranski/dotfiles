@@ -8,6 +8,7 @@ return {
     },
     opts = {
       treesitter_diff_highlight = true,
+      log_date_format = "%Y-%m-%d",
     },
     keys = {
       {
