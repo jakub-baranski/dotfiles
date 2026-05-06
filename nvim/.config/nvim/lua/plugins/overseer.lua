@@ -17,12 +17,16 @@ return {
         end,
         desc = "Toggle Overseer",
       },
-      {
-        "<leader>or",
-        function()
-          require("overseer").run_task()
-        end,
-        desc = "Run Task",
+    },
+  },
+
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        { "<leader>o", group = "overseer", icon = { icon = "", color = "green" } },
+        { "<leader>ot", icon = { icon = "󰒓", color = "green" } },
+        { "<leader>or", icon = { icon = "", color = "yellow" } },
       },
     },
   },

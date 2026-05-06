@@ -44,4 +44,11 @@ vim.keymap.set("n", "<leader>u2c", function()
   end
 end, { noremap = true, silent = true, desc = "Toggle colorcolumn at 100" })
 
-vim.keymap.set("n", "<leader>U", require("custom.undotree").toggle)
+-- vim.keymap.set("n", "<leader>U", require("custom.undotree").toggle, { desc = "Toggle Undotree" })
+
+-- Navigation in terminal mode
+--
+vim.keymap.set("t", "<M-h>", [[<C-\><C-n><C-w>h]], { desc = "Window left from terminal" })
+vim.keymap.set("t", "<M-j>", [[<C-\><C-n><C-w>j]], { desc = "Window down from terminal" })
+vim.keymap.set("t", "<M-k>", [[<C-\><C-n><C-w>k]], { desc = "Window up from terminal" })
+vim.keymap.set("t", "<M-l>", [[<C-\><C-n><C-w>l]], { desc = "Window right from terminal" })

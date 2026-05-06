@@ -10,6 +10,7 @@ Personal configuration files.
 ```
 
 The installation script will:
+
 1. Install missing dependencies
 2. Set up Oh My Zsh and Powerlevel10k
 3. Install Zsh plugins
@@ -49,24 +50,26 @@ stow ghostty
 ```
 
 ### 1. Configure Powerlevel10k
+
 ```bash
 # Run the configuration wizard
 p10k configure
 ```
 
 ### 2. Install Tmux Plugins
+
 ```bash
 
 Press Ctrl-a + I (capital i) to install plugins
 ```
 
-
 ### 3. Install a Nerd Font
+
 For proper icon display in terminal and editor:
+
 ```bash
 brew install --cask font-jetbrains-mono-nerd-font
 ```
-
 
 # Add New Configuration
 
