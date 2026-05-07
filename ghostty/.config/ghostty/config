@@ -52,15 +52,15 @@
 # # Just for example:
 # resize-overlay-duration = 4s 200ms
 
-font-family = Jetbrains Mono
-font-thicken = true
-
 
 # MacOS settings
 #
 macos-titlebar-style = hidden
 macos-option-as-alt = true
 macos-icon = chalkboard
+font-family = Jetbrains Mono
+font-thicken = true
+font-thicken-strength = 255
  
 # Theme
 #

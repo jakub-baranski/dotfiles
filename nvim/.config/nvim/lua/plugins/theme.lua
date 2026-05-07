@@ -4,7 +4,6 @@ return {
     lazy = false,
     priority = 1000,
     opts = {
-      transparent = true,
 
       on_highlights = function(hl, c)
         -- Make line numbers a bit more visible
