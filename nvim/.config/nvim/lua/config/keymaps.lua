@@ -48,6 +48,7 @@ end, { noremap = true, silent = true, desc = "Toggle colorcolumn at 100" })
 
 -- Navigation in terminal mode
 --
+vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { desc = "Exit terminal mode" })
 vim.keymap.set("t", "<M-h>", [[<C-\><C-n><C-w>h]], { desc = "Window left from terminal" })
 vim.keymap.set("t", "<M-j>", [[<C-\><C-n><C-w>j]], { desc = "Window down from terminal" })
 vim.keymap.set("t", "<M-k>", [[<C-\><C-n><C-w>k]], { desc = "Window up from terminal" })
