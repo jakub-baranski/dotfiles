@@ -77,7 +77,10 @@ Provide your review as follows:
 
 For each issue, include - in table format:
 
-- Identifier of an issue - for easier reference later.
+- Identifier of an issue - for easier reference later:
+  - C for critical
+  - M for Major
+  - mi for minor
 - File and line number(s)
 - Clear description of the problem
 - Suggested fix or improvement

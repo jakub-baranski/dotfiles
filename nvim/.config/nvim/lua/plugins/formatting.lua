@@ -2,7 +2,7 @@ return {
   "stevearc/conform.nvim",
   opts = {
     formatters_by_ft = {
-      python = { "black" },
+      python = { "ruff" },
       lua = { "stylua" },
       javascript = { "eslint_d" },
       typescript = { "eslint_d" },
