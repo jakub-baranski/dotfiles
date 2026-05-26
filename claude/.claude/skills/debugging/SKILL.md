@@ -4,47 +4,53 @@ description: Guide for debugging general errors. Use this when asked to fix a ge
 ---
 
 # Overview
+
 Random fixes waste time and create new bugs. Quick patches mask underlying issues.
 
-Core principle: ALWAYS find root cause before attempting fixes. Symptom fixes are failure.
+Core principle: ALWAYS find root cause before attempting fixes.
+Symptom fixes are failure.
 
 Violating the letter of this process is violating the spirit of debugging.
 
-# The Iron Law
+## The Iron Law
+
 NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 If you haven't completed Phase 1, you cannot propose fixes.
 
-# General user interaction guidelines
-1. Always check with the user using `askUserQuestion` if the issue is resolved and if not - ask for more details and continue fixing until the issue is resolved.
-2. Always provide user with a free form answer for your question when asking if problem has been resolved or if they can provide more details.
+## General user interaction guidelines
 
+1. Always check with the user using `askUserQuestion` if the issue is
+resolved and if not - ask for more details and continue fixing until the issue
+is resolved.
+2. Always provide user with a free form answer for your question
+when asking if problem has been resolved or if they can provide more details.
 
-# Phase 1: Root Cause Investigation
+## Phase 1: Root Cause Investigation
+
 BEFORE attempting ANY fix:
 
-## Read Error Messages Carefully
+### Read Error Messages Carefully
 
 Don't skip past errors or warnings
 They often contain the exact solution
 Read stack traces completely
 Note line numbers, file paths, error codes
 
-## Reproduce Consistently
+### Reproduce Consistently
 
 Can you trigger it reliably?
 What are the exact steps?
 Does it happen every time?
 If not reproducible → gather more data, don't guess
 
-## Check Recent Changes
+### Check Recent Changes
 
 What changed that could cause this?
 Git diff, recent commits
 New dependencies, config changes
 Environmental differences
 
-
-# Phase 2: Pattern Analysis
+## Phase 2: Pattern Analysis
 
 Find the pattern before fixing:
 
@@ -54,23 +60,25 @@ Find the pattern before fixing:
 - What works that's similar to what's broken?
 - Compare Against References
 
-2. If implementing pattern, read reference implementation COMPLETELY
+1. If implementing pattern, read reference implementation COMPLETELY
+
 - Don't skim - read every line
 - Understand the pattern fully before applying
 - Identify Differences
 
-3. What's different between working and broken?
+1. What's different between working and broken?
+
 - List every difference, however small
 - Don't assume "that can't matter"
 
-4. Understand Dependencies
+1. Understand Dependencies
 
 - What other components does this need?
 - What settings, config, environment?
 - What assumptions does it make?
 
+## Phase 3: Hypothesis and Testing
 
-# Phase 3: Hypothesis and Testing
 Scientific method:
 
 1. Form Single Hypothesis
@@ -79,27 +87,27 @@ Scientific method:
 - Write it down
 - Be specific, not vague
 
-2. Test Minimally
+1. Test Minimally
 
 - Make the SMALLEST possible change to test hypothesis
 - One variable at a time
 - Don't fix multiple things at once
 
-3. Verify Before Continuing
+1. Verify Before Continuing
 
 - Did it work? Yes → Phase 4
 - Didn't work? Form NEW hypothesis
 - DON'T add more fixes on top
 
-4. When You Don't Know
+1. When You Don't Know
 
 - Say "I don't understand X"
 - Don't pretend to know
 - Ask for help
 - Research more
 
+## Phase 4: Implementation
 
-# Phase 4: Implementation
 Fix the root cause, not the symptom:
 
 1. Create Failing Test Case
@@ -110,20 +118,21 @@ Fix the root cause, not the symptom:
 - MUST have before fixing
 - Use the superpowers:test-driven-development skill for writing proper failing tests
 
-2. Implement Single Fix
+1. Implement Single Fix
 
 - Address the root cause identified
 - ONE change at a time
 - No "while I'm here" improvements
 - No bundled refactoring
 
-3. Verify Fix
+1. Verify Fix
 
 - Test passes now?
 - No other tests broken?
 - Issue actually resolved?
 
-4. If Fix Doesn't Work
+1. If Fix Doesn't Work
+
 - STOP
 - Count: How many fixes have you tried?
 - If < 3: Return to Phase 1, re-analyze with new information
@@ -131,13 +140,13 @@ Fix the root cause, not the symptom:
 - DON'T attempt Fix #4 without architectural discussion
 - If 3+ Fixes Failed: Question Architecture
 
-## Pattern indicating architectural problem:
+### Pattern indicating architectural problem
 
 - Each fix reveals new shared state/coupling/problem in different place
 - Fixes require "massive refactoring" to implement
 - Each fix creates new symptoms elsewhere
 
-## STOP and question fundamentals:
+### STOP and question fundamentals
 
 - Is this pattern fundamentally sound?
 - Are we "sticking with it through sheer inertia"?
@@ -146,9 +155,7 @@ Fix the root cause, not the symptom:
 
 This is NOT a failed hypothesis - this is a wrong architecture.
 
-
-
-# Red Flags - STOP and Follow Process
+## Red Flags - STOP and Follow Process
 
 If you catch yourself thinking:
 
@@ -165,4 +172,3 @@ Proposing solutions before tracing data flow
 Each fix reveals new problem in different place
 
 *ALL of these mean: STOP. Return to Phase 1.
-
