@@ -97,19 +97,18 @@ return {
         { icon = " ", title = "Keymaps", section = "keys", indent = 2, padding = 1 },
         { icon = " ", title = "Recent Files", section = "recent_files", indent = 2, padding = 1 },
         { icon = " ", title = "Projects", section = "projects", indent = 2, padding = 1 },
-        {
-          icon = " ",
-          title = "Git Status",
-          section = "terminal",
-          enabled = function()
-            return Snacks.git.get_root() ~= nil
-          end,
-          cmd = "git status --short --branch --renames",
-          height = 5,
-          padding = 1,
-          ttl = 5 * 60,
-          indent = 3,
-        },
+        function()
+          if not Snacks.git.get_root() then
+            return nil
+          end
+          return {
+            icon = " ",
+            title = "Commit Activity",
+            text = require("git_heatmap").build({ weeks = 18, week_start = "monday" }),
+            padding = 1,
+            indent = 3,
+          }
+        end,
         { section = "startup" },
       }
 

@@ -1,6 +1,7 @@
 return {
   {
     "NeogitOrg/neogit",
+    dir = "/Users/jakubbaranski/Projects/neogit",
     dependencies = {
       "nvim-lua/plenary.nvim", -- required
       "sindrets/diffview.nvim", -- optional - Diff integration
