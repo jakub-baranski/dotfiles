@@ -1,7 +1,7 @@
 return {
   {
     "NeogitOrg/neogit",
-    dir = "/Users/jakubbaranski/Projects/neogit",
+    -- dir = "/Users/jakubbaranski/Projects/neogit",
     dependencies = {
       "nvim-lua/plenary.nvim", -- required
       "sindrets/diffview.nvim", -- optional - Diff integration
@@ -10,6 +10,7 @@ return {
     opts = {
       treesitter_diff_highlight = true,
       log_date_format = "%Y-%m-%d",
+      graph_style = "kitty",
     },
     keys = {
       {

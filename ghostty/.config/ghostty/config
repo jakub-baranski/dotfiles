@@ -61,6 +61,10 @@ macos-icon = chalkboard
 font-family = Jetbrains Mono
 font-thicken = true
 font-thicken-strength = 255
+font-feature = zero
+# not sure i like this one below, but let's test it...
+font-feature = ss02
+
  
 # Theme
 #
