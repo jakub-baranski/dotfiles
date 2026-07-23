@@ -37,8 +37,9 @@ skip_global_compinit=1
 # ZSH PLUGINS
 
 plugins=(
-  git 
-  colored-man-pages 
+  git
+  colored-man-pages
+  fzf-tab
   zsh-autosuggestions
   docker
   zsh-vi-mode

@@ -33,7 +33,7 @@ relative_time() {
 export -f relative_time
 
 get_sessions() {
-  tmux list-sessions -F '#{session_last_attached}|#{session_name}|#{?session_attached,●,○}' | sort -rn
+  tmux list-sessions -F '#{session_last_attached}|#{session_name}|#{session_id}|#{?session_attached,●,○}' | sort -rn
 }
 
 # Per-session agent counts (agent-status.sh --all), computed in the background
@@ -72,10 +72,10 @@ format_sessions() {
   local lines w
   lines=$(cat)
   w=$(printf '%s\n' "$lines" | awk -F'|' '{ if (length($2) > w) w = length($2) } END { print w }')
-  while IFS='|' read -r epoch name indicator; do
+  while IFS='|' read -r epoch name id indicator; do
     age=$(relative_time "$epoch")
     agent_col "$name"
-    printf "%-${w}s  %-8s %s  %s\n" "$name" "$age" "$indicator" "$AGENT_COL"
+    printf "%-${w}s  \033[2m%-4s\033[0m %-8s %s  %s\n" "$name" "$id" "$age" "$indicator" "$AGENT_COL"
   done <<<"$lines"
 }
 
