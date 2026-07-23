@@ -5,6 +5,23 @@
 SELF="$0"
 export SELF
 
+# Keybinding reference, rendered in the preview pane by the f1 toggle.
+if [ "$1" = "--help-text" ]; then
+  printf '\033[1mSession switcher\033[0m\n\n'
+  printf '\033[38;2;130;170;255m%-9s\033[0m %s\n' \
+    'enter' 'Switch to session' \
+    'ctrl-p' 'Switch to previous session' \
+    'ctrl-n' 'New session (prompts for name)' \
+    'ctrl-t' 'New session from current directory' \
+    'ctrl-r' 'Rename session' \
+    'ctrl-o' 'Set session color' \
+    'ctrl-x' 'Kill sessions (multi-select)' \
+    'ctrl-/' 'Toggle preview' \
+    'f1' 'Toggle this help' \
+    'esc' 'Close switcher'
+  exit 0
+fi
+
 # Single timestamp for the whole listing, exported for relative_time calls
 # inside re-exec'd bindings.
 NOW=$(date +%s)
@@ -33,7 +50,7 @@ relative_time() {
 export -f relative_time
 
 get_sessions() {
-  tmux list-sessions -F '#{session_last_attached}|#{session_name}|#{session_id}|#{?session_attached,●,○}' | sort -rn
+  tmux list-sessions -F '#{session_last_attached}|#{session_name}|#{session_id}|#{@session_color}|#{?session_attached,●,○}' | sort -rn
 }
 
 # Per-session agent counts (agent-status.sh --all), computed in the background
@@ -72,31 +89,40 @@ format_sessions() {
   local lines w
   lines=$(cat)
   w=$(printf '%s\n' "$lines" | awk -F'|' '{ if (length($2) > w) w = length($2) } END { print w }')
-  while IFS='|' read -r epoch name id indicator; do
+  # Rows are "<id>\t<name>\t<display>" (--with-nth hides the key fields):
+  # bindings target {1} because ids are exact and space-free, names aren't.
+  local padded
+  while IFS='|' read -r epoch name id color indicator; do
     age=$(relative_time "$epoch")
     agent_col "$name"
-    printf "%-${w}s  \033[2m%-4s\033[0m %-8s %s  %s\n" "$name" "$id" "$age" "$indicator" "$AGENT_COL"
+    # Pad before colorizing: escape codes would count toward %-Ns width.
+    printf -v padded "%-${w}s" "$name"
+    if [[ $color =~ ^#[0-9a-fA-F]{6}$ ]]; then
+      padded=$'\033[38;2;'"$((16#${color:1:2}));$((16#${color:3:2}));$((16#${color:5:2}))m$padded"$'\033[0m'
+    fi
+    printf "%s\t%s\t%s  \033[2m%-4s\033[0m %-8s %s  %s\n" \
+      "$id" "$name" "$padded" "$id" "$age" "$indicator" "$AGENT_COL"
   done <<<"$lines"
 }
 
 # ── Bindings ────────────────────────────────────────────────────────────────
 
-# ctrl-x: multi-select kill — fzf is re-invoked with --multi for selection,
-# then each chosen session name is killed in a loop.
+# ctrl-x: multi-select kill via a second fzf with --multi.
 kill_binding="ctrl-x:become(
-  selections=\$(tmux list-sessions -F '#{session_last_attached}|#{session_name}|#{?session_attached,●,○}' | sort -rn |
-    while IFS='|' read -r epoch name indicator; do
+  selections=\$(tmux list-sessions -F '#{session_last_attached}|#{session_name}|#{session_id}|#{?session_attached,●,○}' | sort -rn |
+    while IFS='|' read -r epoch name id indicator; do
       age=\$(relative_time \"\$epoch\")
-      printf '%-30s %-10s %s\n' \"\$name\" \"\$age\" \"\$indicator\"
+      printf '%s\t%-30s %-10s %s\n' \"\$id\" \"\$name\" \"\$age\" \"\$indicator\"
     done |
     fzf --multi --no-sort \
+        --delimiter='\t' --with-nth=2.. \
         --prompt='Kill sessions (TAB to select multiple): ' \
         --header='<TAB>: toggle | <RET>: kill selected | <ESC>: cancel' \
         --border --border-label=' Kill Sessions ' \
         --height=40%)
   if [ -n \"\$selections\" ]; then
     while IFS= read -r line; do
-      session=\$(echo \"\$line\" | awk '{print \$1}')
+      session=\$(printf '%s' \"\$line\" | cut -f1)
       tmux kill-session -t \"\$session\" 2>/dev/null
     done <<< \"\$selections\"
   fi
@@ -105,7 +131,7 @@ kill_binding="ctrl-x:become(
 
 rename_binding="ctrl-r:become(
   new_name=\$(printf '' | fzf --print-query \
-    --prompt='Rename {1} to: ' \
+    --prompt='Rename {2} to: ' \
     --height=3 --border --border-label=' Rename Session ' | head -1)
   [ -n \"\$new_name\" ] && tmux rename-session -t '{1}' \"\$new_name\"
   exec \"\$SELF\"
@@ -117,6 +143,22 @@ create_binding="ctrl-n:become(
     --prompt='New session name: ' \
     --height=3 --border --border-label=' Create Session ' --no-info | head -1)
   [ -n \"\$name\" ] && tmux new-session -d -s \"\$name\" && tmux switch-client -t \"\$name\"
+  exec \"\$SELF\"
+)"
+
+# ctrl-o: pick a status-bar color for the highlighted session; the palette
+# comes from session-color.sh
+color_binding="ctrl-o:become(
+  color=\$(\"\$HOME/.tmux/scripts/session-color.sh\" --palette |
+    while IFS= read -r c; do
+      r=\$((16#\${c:1:2})); g=\$((16#\${c:3:2})); b=\$((16#\${c:5:2}))
+      printf '\033[48;2;%d;%d;%dm      \033[0m %s\n' \"\$r\" \"\$g\" \"\$b\" \"\$c\"
+    done |
+    fzf --ansi --no-sort \
+        --prompt='Color for {2}: ' \
+        --height=12 --border --border-label=' Session Color ' |
+    awk '{print \$NF}')
+  [ -n \"\$color\" ] && tmux set-option -t '{1}' @session_color \"\$color\"
   exec \"\$SELF\"
 )"
 
@@ -132,13 +174,29 @@ create_cwd_binding="ctrl-t:become(
   exec \"\$SELF\"
 )"
 
+# f1: toggle help in the preview pane. The HELP_STATE flag exists while help
+# is shown;
+# Colon-form transform because the parens in the echoed actions would confuse fzf's bind parser.
+HELP_STATE="${TMPDIR:-/tmp}/session-switcher-help-$USER"
+export HELP_STATE
+rm -f "$HELP_STATE"
+help_binding="f1:transform:
+  if [ -e \"\$HELP_STATE\" ]; then
+    rm -f \"\$HELP_STATE\"
+    echo 'refresh-preview'
+  else
+    touch \"\$HELP_STATE\"
+    echo 'show-preview+preview(\"\$SELF\" --help-text)'
+  fi"
+
 switch_previous_binding="ctrl-p:become(
-  previous=\$(tmux list-sessions -F '#{session_last_attached}|#{session_name}' |
+  previous=\$(tmux list-sessions -F '#{session_last_attached}|#{session_id}' |
     sort -rn | sed -n '2p' | cut -d'|' -f2)
   [ -n \"\$previous\" ] && tmux switch-client -t \"\$previous\"
 )"
 
-preview_cmd='tmux capture-pane -ep -t {1} 2>/dev/null'
+# rm: leaving help mode by moving the cursor must clear the f1 toggle flag.
+preview_cmd='rm -f "$HELP_STATE"; tmux capture-pane -ep -t {1} 2>/dev/null'
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
@@ -148,19 +206,22 @@ selected=$(get_sessions | format_sessions |
   fzf --reverse \
     --ansi \
     --no-sort \
+    --delimiter='\t' --with-nth=3.. \
     --with-shell 'bash -c' \
     --style=full \
-    --header=$'<C-x>: Kill | <C-r>: Rename | <C-n>: New | <C-t>: New from cwd | <C-p>: Previous | <C-/>: Toggle preview' \
+    --header=$'<F1>: Help' \
     --border-label=' Select a tmux session ' \
     --bind="$kill_binding" \
     --bind="$rename_binding" \
     --bind="$create_binding" \
     --bind="$create_cwd_binding" \
+    --bind="$color_binding" \
     --bind="$switch_previous_binding" \
+    --bind="$help_binding" \
     --bind='ctrl-/:toggle-preview' \
     --preview="$preview_cmd" \
     --preview-window='right,65%,nowrap,<85(down,45%,nowrap)' |
-  awk '{print $1}')
+  cut -f1)
 
 if [ -n "$selected" ]; then
   tmux switch-client -t "$selected"
