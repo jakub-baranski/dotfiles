@@ -131,9 +131,9 @@ kill_binding="ctrl-x:become(
 
 rename_binding="ctrl-r:become(
   new_name=\$(printf '' | fzf --print-query \
-    --prompt='Rename {2} to: ' \
+    --prompt='Rename '{2}' to: ' \
     --height=3 --border --border-label=' Rename Session ' | head -1)
-  [ -n \"\$new_name\" ] && tmux rename-session -t '{1}' \"\$new_name\"
+  [ -n \"\$new_name\" ] && tmux rename-session -t {1} \"\$new_name\"
   exec \"\$SELF\"
 )"
 
@@ -155,10 +155,10 @@ color_binding="ctrl-o:become(
       printf '\033[48;2;%d;%d;%dm      \033[0m %s\n' \"\$r\" \"\$g\" \"\$b\" \"\$c\"
     done |
     fzf --ansi --no-sort \
-        --prompt='Color for {2}: ' \
+        --prompt='Color for '{2}': ' \
         --height=12 --border --border-label=' Session Color ' |
     awk '{print \$NF}')
-  [ -n \"\$color\" ] && tmux set-option -t '{1}' @session_color \"\$color\"
+  [ -n \"\$color\" ] && tmux set-option -t {1} @session_color \"\$color\"
   exec \"\$SELF\"
 )"
 
