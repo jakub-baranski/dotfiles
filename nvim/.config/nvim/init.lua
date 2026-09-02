@@ -2,3 +2,4 @@
 require("config.lazy")
 require("quit_to_dashboard")
 require("todo_dates").setup()
+require("review_comments").setup()

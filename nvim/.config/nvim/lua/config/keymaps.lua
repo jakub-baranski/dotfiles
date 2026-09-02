@@ -53,3 +53,19 @@ vim.keymap.set("t", "<M-h>", [[<C-\><C-n><C-w>h]], { desc = "Window left from te
 vim.keymap.set("t", "<M-j>", [[<C-\><C-n><C-w>j]], { desc = "Window down from terminal" })
 vim.keymap.set("t", "<M-k>", [[<C-\><C-n><C-w>k]], { desc = "Window up from terminal" })
 vim.keymap.set("t", "<M-l>", [[<C-\><C-n><C-w>l]], { desc = "Window right from terminal" })
+
+-- Review comments (lua/review_comments)
+-- ------------------------------
+local rc = function(fn)
+  return function()
+    require("review_comments")[fn]()
+  end
+end
+vim.keymap.set({ "n", "x" }, "<leader>ra", rc("add"), { desc = "Add review comment" })
+vim.keymap.set("n", "<leader>rv", rc("show"), { desc = "View review comment" })
+vim.keymap.set("n", "<leader>re", rc("edit"), { desc = "Edit review comment" })
+vim.keymap.set("n", "<leader>rd", rc("delete"), { desc = "Delete review comment" })
+vim.keymap.set("n", "<leader>rr", rc("toggle_resolved"), { desc = "Resolve/unresolve review comment" })
+vim.keymap.set("n", "<leader>rt", rc("toggle"), { desc = "Toggle review comments" })
+vim.keymap.set("n", "]r", rc("next"), { desc = "Next review comment" })
+vim.keymap.set("n", "[r", rc("prev"), { desc = "Prev review comment" })

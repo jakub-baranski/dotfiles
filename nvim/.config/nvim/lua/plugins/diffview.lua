@@ -9,6 +9,11 @@ return {
     require("diffview").setup({
       enhanced_diff_hl = true,
       use_icons = true,
+      hooks = {
+        diff_buf_win_enter = function(bufnr)
+          require("review_comments").refresh(bufnr)
+        end,
+      },
     })
   end,
   keys = {
