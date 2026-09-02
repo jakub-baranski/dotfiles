@@ -24,10 +24,18 @@ TARGET="$1"
 # Process names treated as agents (exact basename match, case-insensitive).
 AGENTS="claude|codex|opencode|gemini|aider|amp|goose|crush|cursor-agent"
 
-# "busy" markers:
-#   - "esc to interrupt/cancel" hints             (claude, codex, gemini, opencode)
-#   - a spinner line "✳ Befuddling… (4m 5s · …)"  (claude)
-BUSY_REGEX='[Ee]sc(ape)? (to )?(interrupt|cancel)|^[^[:alnum:][:space:]]+ [A-Z][a-z]+(…|\.\.\.) \('
+# "busy" markers — three independent signals, any one means "working":
+#   - "esc to interrupt/cancel" hints                 (codex, gemini, opencode, older claude)
+#   - the thinking/streaming spinner: a glyph-prefixed line ending in an
+#     ellipsis followed by an elapsed timer, e.g.
+#       "✳ Scoping Phase 2 frontend endpoints… (33m 26s · ↓ 110k tokens)"
+#     The status text is a free-form phrase, NOT a single word, so we match
+#     "<glyph> … (<n>m <n>s" rather than "<glyph> <Word>… (".
+#   - a running tool line carrying a live "· <elapsed>s" timer, e.g.
+#       "⏺ Finding file-level failure · 18s"  or  "⏺ Running … · 6s…"
+#     The trailing "…" animates in and out, so it is optional; a word
+#     boundary after the "s" keeps "· 2 shells" from matching.
+BUSY_REGEX='[Ee]sc(ape)? (to )?(interrupt|cancel)|^[^[:alnum:][:space:]].*(…|\.\.\.) \([0-9]+m?[[:space:]]?[0-9]*s|·[[:space:]][0-9]+m?[[:space:]]?[0-9]*s([[:space:]…]|$)'
 
 # "attention" markers: permission prompts, plan approval, question menus.
 ATTENTION_REGEX='Do you want|Would you like|Do you trust|❯ 1\.'
@@ -84,7 +92,9 @@ agent_panes=$(ps -Ao ppid=,pid=,comm= | awk -v panes="$panes" -v agents="$AGENTS
 # question, but a real dialog never coexists with the spinner.
 pane_state() {
   local bottom
-  bottom=$(tmux capture-pane -p -t "$1" 2>/dev/null | grep -v '^[[:space:]]*$' | tail -15)
+  # tail -30, not -15: Claude renders the todo checklist BELOW the spinner,
+  # so a long checklist can push the spinner out of a 15-line window.
+  bottom=$(tmux capture-pane -p -t "$1" 2>/dev/null | grep -v '^[[:space:]]*$' | tail -30)
   if printf '%s\n' "$bottom" | grep -qE "$BUSY_REGEX"; then
     printf 'busy'
   elif printf '%s\n' "$bottom" | grep -qE "$ATTENTION_REGEX"; then

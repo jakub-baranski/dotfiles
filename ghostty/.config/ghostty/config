@@ -53,6 +53,7 @@
 # resize-overlay-duration = 4s 200ms
 
 
+
 # MacOS settings
 #
 macos-titlebar-style = hidden
@@ -85,7 +86,7 @@ mouse-hide-while-typing = true
 
 # auto update settings
 auto-update = download
-auto-update-channel = stable
+auto-update-channel = tip
 
 # extras
 shell-integration-features = true
