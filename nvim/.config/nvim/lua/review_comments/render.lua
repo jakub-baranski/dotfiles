@@ -20,16 +20,47 @@ local state = {}
 
 local SIGN = "󰆉"
 
+---@param name string
+---@param attr "fg"|"bg"
+---@return integer?
+local function hl_color(name, attr)
+  local hl = vim.api.nvim_get_hl(0, { name = name, link = false })
+  return hl and hl[attr] or nil
+end
+
+--- Blend two 24-bit colors: alpha * c1 + (1 - alpha) * c2.
+---@param c1 integer
+---@param c2 integer
+---@param alpha number 0..1
+---@return integer
+local function blend(c1, c2, alpha)
+  local r = math.floor(math.floor(c1 / 0x10000) * alpha + math.floor(c2 / 0x10000) * (1 - alpha) + 0.5)
+  local g = math.floor((math.floor(c1 / 0x100) % 0x100) * alpha + (math.floor(c2 / 0x100) % 0x100) * (1 - alpha) + 0.5)
+  local b = math.floor((c1 % 0x100) * alpha + (c2 % 0x100) * (1 - alpha) + 0.5)
+  return r * 0x10000 + g * 0x100 + b
+end
+
 function M.setup_highlights()
   local set = function(name, opts)
     opts.default = true
     vim.api.nvim_set_hl(0, name, opts)
   end
-  set("ReviewCommentSign", { link = "DiagnosticInfo" })
-  set("ReviewCommentRange", { link = "CursorLine" })
-  set("ReviewCommentBorder", { link = "Comment" })
-  set("ReviewCommentTitle", { link = "Title" })
-  set("ReviewComment", { link = "Normal" })
+
+  local accent = hl_color("DiagnosticInfo", "fg") or 0x569cd6
+  local normal_bg = hl_color("Normal", "bg")
+  -- Tinted background so the comment block stands apart from the code.
+  local block_bg = normal_bg and blend(accent, normal_bg, 0.15) or hl_color("CursorLine", "bg")
+  local range_bg = normal_bg and blend(accent, normal_bg, 0.07) or nil
+
+  set("ReviewCommentSign", { fg = accent })
+  if range_bg then
+    set("ReviewCommentRange", { bg = range_bg })
+  else
+    set("ReviewCommentRange", { link = "CursorLine" })
+  end
+  set("ReviewCommentBorder", { fg = accent, bg = block_bg })
+  set("ReviewCommentTitle", { fg = accent, bg = block_bg, bold = true })
+  set("ReviewComment", { fg = hl_color("Normal", "fg"), bg = block_bg })
   set("ReviewCommentResolved", { link = "Comment" })
   set("ReviewCommentOutdated", { link = "DiagnosticWarn" })
 end
@@ -83,18 +114,32 @@ local function virt_lines_for(c, loc, width)
       },
     }
   end
-  local lines = {}
-  local title = "review"
+  local title = SIGN .. " review"
   if loc.status == "moved" then
     title = title .. " (moved from L" .. c.start_line .. ")"
   end
-  lines[#lines + 1] = { { pad .. "╭─ " .. SIGN .. " ", "ReviewCommentBorder" }, { title, "ReviewCommentTitle" } }
-  for _, l in ipairs(wrap(c.text, width)) do
-    lines[#lines + 1] = { { pad .. "│ ", "ReviewCommentBorder" }, { l, "ReviewComment" } }
+  local content = wrap(c.text, width)
+
+  -- Pad every line to a common width so the background forms a solid block.
+  local block_w = vim.fn.strdisplaywidth(title)
+  for _, l in ipairs(content) do
+    block_w = math.max(block_w, vim.fn.strdisplaywidth(l))
   end
-  lines[#lines + 1] = { { pad .. "╰─", "ReviewCommentBorder" } }
+  block_w = math.min(block_w + 1, width)
+  local function padded(s)
+    return s .. string.rep(" ", math.max(0, block_w - vim.fn.strdisplaywidth(s)))
+  end
+
+  local lines = {}
+  lines[#lines + 1] = { { pad, "" }, { "▌ ", "ReviewCommentBorder" }, { padded(title), "ReviewCommentTitle" } }
+  for _, l in ipairs(content) do
+    lines[#lines + 1] = { { pad, "" }, { "▌ ", "ReviewCommentBorder" }, { padded(l), "ReviewComment" } }
+  end
   return lines
 end
+
+--- Virtual lines for a comment (also used by the picker preview).
+M.virt_lines_for = virt_lines_for
 
 ---@param bufnr integer
 function M.clear(bufnr)

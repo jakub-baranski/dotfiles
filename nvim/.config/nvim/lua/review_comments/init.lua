@@ -7,8 +7,25 @@ local editor = require("review_comments.editor")
 
 local M = {}
 
+---@class ReviewOpts
+---@field picker string|fun(items: ReviewPickerItem[], root: string) "snacks" (default), "quickfix", or a custom function
+M.opts = { picker = "snacks" }
+
 local DEBOUNCE_MS = 150
 local timer
+
+--- Repo root of the current buffer, falling back to the cwd's repo.
+---@return string?
+local function project_root()
+  local info = buf.resolve(vim.api.nvim_get_current_buf())
+  if info then
+    return info.root
+  end
+  local res = vim.system({ "git", "rev-parse", "--show-toplevel" }, { cwd = vim.fn.getcwd(), text = true }):wait()
+  if res.code == 0 then
+    return vim.trim(res.stdout)
+  end
+end
 
 ---@param bufnr? integer
 function M.refresh(bufnr)
@@ -232,6 +249,58 @@ local function jump(dir)
   vim.api.nvim_win_set_cursor(0, { target.start, 0 })
 end
 
+--- Copy all unresolved comments of the current repo to the clipboard as markdown,
+--- ready to paste into an agent prompt.
+function M.export()
+  local root = project_root()
+  if not root then
+    vim.notify("review_comments: not inside a git repository", vim.log.levels.WARN)
+    return
+  end
+  local comments = vim.tbl_filter(function(c)
+    return not c.resolved
+  end, store.list(root))
+  if #comments == 0 then
+    vim.notify("review_comments: no unresolved comments", vim.log.levels.INFO)
+    return
+  end
+  table.sort(comments, function(a, b)
+    if a.path ~= b.path then
+      return a.path < b.path
+    end
+    return a.start_line < b.start_line
+  end)
+
+  local out = { "# Review comments", "" }
+  for i, c in ipairs(comments) do
+    local range = c.start_line == c.end_line and tostring(c.start_line) or (c.start_line .. "-" .. c.end_line)
+    local side = c.side == "a" and " (on the old/removed version of these lines)" or ""
+    out[#out + 1] = string.format("## %d. `%s:%s`%s", i, c.path, range, side)
+    out[#out + 1] = ""
+    out[#out + 1] = "Referenced code:"
+    out[#out + 1] = "```"
+    vim.list_extend(out, c.snapshot)
+    out[#out + 1] = "```"
+    out[#out + 1] = ""
+    vim.list_extend(out, vim.split(c.text, "\n", { plain = true }))
+    out[#out + 1] = ""
+  end
+  local text = table.concat(out, "\n")
+  vim.fn.setreg("+", text)
+  vim.fn.setreg('"', text)
+  vim.notify(("review_comments: copied %d comment(s) to clipboard"):format(#comments))
+end
+
+--- List all comments in the repository in the configured picker.
+function M.list()
+  local root = project_root()
+  if not root then
+    vim.notify("review_comments: not inside a git repository", vim.log.levels.WARN)
+    return
+  end
+  require("review_comments.picker").open(root, M.opts.picker)
+end
+
 function M.next()
   jump(1)
 end
@@ -240,7 +309,9 @@ function M.prev()
   jump(-1)
 end
 
-function M.setup()
+---@param opts? ReviewOpts
+function M.setup(opts)
+  M.opts = vim.tbl_deep_extend("force", M.opts, opts or {})
   render.setup_highlights()
   local group = vim.api.nvim_create_augroup("ReviewComments", { clear = true })
 
@@ -297,6 +368,10 @@ function M.setup()
     elseif sub == "refresh" then
       store.invalidate()
       M.refresh()
+    elseif sub == "export" then
+      M.export()
+    elseif sub == "list" then
+      M.list()
     elseif sub == "next" then
       M.next()
     elseif sub == "prev" then
@@ -308,7 +383,7 @@ function M.setup()
     nargs = "?",
     range = true,
     complete = function()
-      return { "add", "show", "edit", "delete", "resolve", "toggle", "refresh", "next", "prev" }
+      return { "add", "show", "edit", "delete", "resolve", "toggle", "refresh", "export", "list", "next", "prev" }
     end,
   })
 end

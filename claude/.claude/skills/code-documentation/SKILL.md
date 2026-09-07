@@ -23,8 +23,7 @@ Don't comment what is done, comment why it's done this way.
 - Don't restate what a type annotation, `NotRequired`, `total=False`, `Optional`,
 or a clear name already encodes.
 - Test docstrings: same rules. Test names describe behavior;
-Docstrings only exist for a non-obvious invariant. Never narrate the bug history
-or the surrounding parser flow.
+Docstrings only exist for a non-obvious invariant. Never narrate the bug history.
 - One sentence max per comment unless documenting a specific external spec/bug ID.
 - Don't put comments explaining what the code does.
 - Comment only non-obvious things and add a comment explaining "why"
