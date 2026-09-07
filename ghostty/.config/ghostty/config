@@ -69,10 +69,8 @@ font-feature = ss02
  
 # Theme
 #
-# theme = light:Rose Pine Dawn,dark:TokyoNight Storm
-theme = light:Catppuccin Latte,dark:TokyoNight Storm
-
-# theme = light:Monokai Pro Light,dark:Monokai Pro Machine
+# Gitignored; written by the `theme` CLI (dotfiles/theme).
+config-file = ?theme.conf
 
 
 background-opacity = 0.98

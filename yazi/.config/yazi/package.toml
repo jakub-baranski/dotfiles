@@ -5,3 +5,23 @@ deps = []
 use = "yazi-rs/flavors:catppuccin-latte"
 rev = "3edeb49"
 hash = "31f2ba594080bfc2a68d054101cdc5f1"
+
+[[flavor.deps]]
+use = "yazi-rs/flavors:catppuccin-mocha"
+rev = "20b47bf"
+hash = "ce320f877fe709b189433941aba747c4"
+
+[[flavor.deps]]
+use = "BennyOe/tokyo-night"
+rev = "8e6296f"
+hash = "d9da921c3bd37ba32ee27a8a7a40461f"
+
+[[flavor.deps]]
+use = "stellarjmr/everforest-light"
+rev = "6a4a54a"
+hash = "3268fbd4d3596f2c82296d56c942010b"
+
+[[flavor.deps]]
+use = "stellarjmr/everforest-dark"
+rev = "1571580"
+hash = "eaad414e0592b9637b5af1449759c171"

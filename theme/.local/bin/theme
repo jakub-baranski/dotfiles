@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# theme — one selector for color themes across ghostty, nvim, tmux and yazi.
+#
+# A "pair" (~/.config/theme/pairs/*.conf) bundles a light and a dark theme
+# for each app; macOS appearance decides which half is active. Every app but
+# tmux follows the OS on its own, so `theme tmux-poll` runs from the tmux
+# status line to catch appearance flips.
+#
+# Usage:
+#   theme             fzf picker (falls back to `theme list`)
+#   theme set NAME    activate a pair
+#   theme list        list pairs, current marked with *
+#   theme mode        print light|dark
+#   theme sync        regenerate everything for the current pair
+#   theme tmux-poll   called from tmux status-right every second; no output
+
+set -euo pipefail
+
+PAIRS_DIR="$HOME/.config/theme/pairs"
+STATE_DIR="$HOME/.local/state/theme"
+GHOSTTY_FRAGMENT="$HOME/.config/ghostty/theme.conf"
+YAZI_FLAVORS="$HOME/.config/yazi/flavors"
+
+mode() {
+  if defaults read -g AppleInterfaceStyle >/dev/null 2>&1; then
+    echo dark
+  else
+    echo light
+  fi
+}
+
+current_pair() {
+  cat "$STATE_DIR/pair" 2>/dev/null || true
+}
+
+load_pair() {
+  if [[ ! -f "$PAIRS_DIR/$1.conf" ]]; then
+    echo "theme: unknown pair '$1' (see: theme list)" >&2
+    exit 1
+  fi
+  # shellcheck source=/dev/null
+  source "$PAIRS_DIR/$1.conf"
+}
+
+# Tmux colors are @theme_* user options referenced with #{@theme_*} in
+# .tmux.conf formats, so setting them recolors the status line immediately.
+write_tmux_fragment() {
+  local m="$1" active accent text pill_text inactive
+  if [[ "$m" == dark ]]; then
+    active=$TMUX_DARK_ACTIVE accent=$TMUX_DARK_ACCENT text=$TMUX_DARK_TEXT
+    pill_text=$TMUX_DARK_PILL_TEXT inactive=$TMUX_DARK_INACTIVE
+  else
+    active=$TMUX_LIGHT_ACTIVE accent=$TMUX_LIGHT_ACCENT text=$TMUX_LIGHT_TEXT
+    pill_text=$TMUX_LIGHT_PILL_TEXT inactive=$TMUX_LIGHT_INACTIVE
+  fi
+  cat > "$STATE_DIR/tmux.conf" <<EOF
+set -g @theme_active "$active"
+set -g @theme_accent "$accent"
+set -g @theme_text "$text"
+set -g @theme_pill_text "$pill_text"
+set -g @theme_inactive "$inactive"
+EOF
+  echo "$m" > "$STATE_DIR/mode"
+}
+
+apply_pair() {
+  local name="$1"
+  load_pair "$name"
+  mkdir -p "$STATE_DIR"
+  echo "$name" > "$STATE_DIR/pair"
+
+  printf 'theme = light:%s,dark:%s\n' "$GHOSTTY_LIGHT" "$GHOSTTY_DARK" > "$GHOSTTY_FRAGMENT"
+
+  # Nvim reads this at startup and on every auto-dark-mode flip.
+  printf 'return { light = "%s", dark = "%s" }\n' "$NVIM_LIGHT" "$NVIM_DARK" \
+    > "$STATE_DIR/nvim.lua"
+
+  # Stable symlink names let theme.toml stay static while pairs change.
+  ln -sfn "$YAZI_LIGHT.yazi" "$YAZI_FLAVORS/current-light.yazi"
+  ln -sfn "$YAZI_DARK.yazi" "$YAZI_FLAVORS/current-dark.yazi"
+
+  write_tmux_fragment "$(mode)"
+  if tmux info >/dev/null 2>&1; then
+    tmux source-file "$STATE_DIR/tmux.conf" >/dev/null 2>&1 || true
+  fi
+
+  push_nvim
+  reload_ghostty
+}
+
+# Ghostty has no reload IPC, but clicking its menu item works when the
+# Automation permission is granted; otherwise fall back to asking.
+reload_ghostty() {
+  local script='tell application "System Events" to tell process "Ghostty" to click menu item "Reload Configuration" of menu 1 of menu bar item "Ghostty" of menu bar 1'
+  if ! osascript -e "$script" >/dev/null 2>&1; then
+    echo "theme: reload ghostty manually (cmd+shift+,)"
+  fi
+}
+
+# ThemeSync (plugins/theme.lua) re-reads the pair; dead sockets fail silently.
+push_nvim() {
+  local sock
+  while IFS= read -r sock; do
+    command nvim --server "$sock" --remote-send '<Cmd>lua pcall(ThemeSync)<CR>' \
+      >/dev/null 2>&1 || true
+  done < <(find "${TMPDIR:-/tmp}/nvim.$USER" -type s -name 'nvim.*.0' 2>/dev/null)
+}
+
+# A pair conf may set LABEL for a more descriptive display name (e.g.
+# "cendre/rose-pine-dawn"); `theme set` still takes the file's base name.
+pair_label() {
+  (LABEL=""; source "$PAIRS_DIR/$1.conf" >/dev/null 2>&1; echo "${LABEL:-$1}")
+}
+
+# Tab-separated "name<TAB>marker label" rows; fzf shows the second field.
+list_rows() {
+  local cur f name mark
+  cur=$(current_pair)
+  for f in "$PAIRS_DIR"/*.conf; do
+    [[ -e "$f" ]] || continue
+    name=$(basename "$f" .conf)
+    mark=" "; [[ "$name" == "$cur" ]] && mark="*"
+    printf '%s\t%s %s\n' "$name" "$mark" "$(pair_label "$name")"
+  done
+}
+
+cmd_list() {
+  list_rows | cut -f2
+}
+
+cmd_pick() {
+  if ! command -v fzf >/dev/null 2>&1; then
+    cmd_list
+    echo "usage: theme set NAME" >&2
+    return 0
+  fi
+  local sel
+  sel=$(list_rows | fzf --height=~40% --prompt='theme pair> ' \
+    --delimiter='\t' --with-nth=2 | cut -f1) || return 0
+  [[ -n "$sel" ]] && cmd_set "$sel"
+}
+
+cmd_set() {
+  apply_pair "$1"
+  echo "theme: pair '$1' active ($(mode) mode)"
+}
+
+cmd_sync() {
+  local cur
+  cur=$(current_pair)
+  [[ -n "$cur" ]] || { echo "theme: no pair set (use: theme set NAME)" >&2; exit 1; }
+  apply_pair "$cur"
+}
+
+# Runs every second from tmux status-right; cheap unless the mode flipped.
+cmd_tmux_poll() {
+  local m cur
+  m=$(mode)
+  [[ "$m" == "$(cat "$STATE_DIR/mode" 2>/dev/null)" ]] && return 0
+  cur=$(current_pair)
+  [[ -n "$cur" ]] || return 0
+  load_pair "$cur"
+  mkdir -p "$STATE_DIR"
+  write_tmux_fragment "$m"
+  tmux source-file "$STATE_DIR/tmux.conf" >/dev/null 2>&1 || true
+}
+
+case "${1:-pick}" in
+  pick) cmd_pick ;;
+  set) [[ $# -ge 2 ]] || { echo "usage: theme set NAME" >&2; exit 1; }
+       cmd_set "$2" ;;
+  list) cmd_list ;;
+  mode) mode ;;
+  sync) cmd_sync ;;
+  tmux-poll) cmd_tmux_poll ;;
+  *) echo "usage: theme [pick|set NAME|list|mode|sync|tmux-poll]" >&2; exit 1 ;;
+esac
