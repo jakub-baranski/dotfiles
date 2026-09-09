@@ -158,7 +158,8 @@ color_binding="ctrl-o:become(
         --prompt='Color for '{2}': ' \
         --height=12 --border --border-label=' Session Color ' |
     awk '{print \$NF}')
-  [ -n \"\$color\" ] && tmux set-option -t {1} @session_color \"\$color\"
+  [ -n \"\$color\" ] && tmux set-option -t {1} @session_color \"\$color\" &&
+    \"\$HOME/.tmux/scripts/session-color.sh\" {1}
   exec \"\$SELF\"
 )"
 
