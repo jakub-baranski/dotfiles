@@ -6,13 +6,18 @@ return {
     "nvim-lua/plenary.nvim",
   },
   config = function()
+    local labels = require("diffview_labels")
+    labels.setup()
+
     require("diffview").setup({
       enhanced_diff_hl = true,
       use_icons = true,
       hooks = {
-        diff_buf_win_enter = function(bufnr)
+        diff_buf_win_enter = function(bufnr, winid, ctx)
           require("review_comments").refresh(bufnr)
+          labels.set(bufnr, winid, ctx)
         end,
+        view_opened = labels.reset,
       },
     })
   end,
