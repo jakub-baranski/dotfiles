@@ -23,3 +23,14 @@ vim.g.trouble_lualine = false
 
 -- Undotree
 vim.cmd("packadd nvim.undotree")
+
+-- Heavier box-drawing glyphs for window separators so splits read as thicker lines.
+vim.opt.fillchars:append({
+  vert = "┃",
+  horiz = "━",
+  horizup = "┻",
+  horizdown = "┳",
+  vertleft = "┫",
+  vertright = "┣",
+  verthoriz = "╋",
+})
