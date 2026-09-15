@@ -30,3 +30,4 @@ Docstrings only exist for a non-obvious invariant. Never narrate the bug history
 something is done this way.
 - Keep comments short, understandable and glanceable.
 - Avoid docstring reiterating name of the method or class.
+- Avoid comments headings at the top of the file unless these are crucial.
