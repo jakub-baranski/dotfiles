@@ -7,6 +7,12 @@
 -- Disable horizontal scrolling with mouse wheel
 vim.keymap.set("n", "<ScrollWheelRight>", "<Nop>")
 
+-- PageUp/PageDown scroll half a page instead of a full one
+vim.keymap.set({ "n", "x" }, "<PageUp>", "<C-u>", { desc = "Scroll half page up" })
+vim.keymap.set({ "n", "x" }, "<PageDown>", "<C-d>", { desc = "Scroll half page down" })
+vim.keymap.set("i", "<PageUp>", "<C-o><C-u>", { desc = "Scroll half page up" })
+vim.keymap.set("i", "<PageDown>", "<C-o><C-d>", { desc = "Scroll half page down" })
+
 -- INDENTING
 -- ------------------------------
 -- For normal mode (command/normal mode)
