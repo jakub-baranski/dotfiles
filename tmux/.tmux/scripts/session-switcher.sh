@@ -67,10 +67,11 @@ rm -f "$AGENT_SUMMARY_FILE"
 agent_col() {
   AGENT_COL=""
   [ -r "$AGENT_SUMMARY_FILE" ] || return 0
-  local name b a i
-  while IFS=$'\t' read -r name b a i; do
+  local name b a i w
+  while IFS=$'\t' read -r name b a i w; do
     [ "$name" = "$1" ] || continue
     [ "${a:-0}" -gt 0 ] && AGENT_COL+=$'\033[1;38;2;255;117;127m󱈸'"$a"$'\033[0m '
+    [ "${w:-0}" -gt 0 ] && AGENT_COL+=$'\033[1;38;2;192;153;255m󰂚'"$w"$'\033[0m '
     [ "${b:-0}" -gt 0 ] && AGENT_COL+=$'\033[38;2;195;232;141m󰪥'"$b"$'\033[0m '
     [ "${i:-0}" -gt 0 ] && AGENT_COL+=$'\033[38;2;255;199;119m󰧞'"$i"$'\033[0m '
     break
