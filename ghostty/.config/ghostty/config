@@ -102,6 +102,4 @@ keybind = command+k=text:\x0c
 
 
 # Cursor shaders
-# custom-shader = shaders/cursor_synesthaxia(tweened).glsl
-# custom-shader = shaders/blaze_sparks.glsl
 custom-shader = shaders/neovide_like.glsl
