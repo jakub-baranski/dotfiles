@@ -17,9 +17,18 @@ M.FILENAME = ".review-comments.json"
 
 ---@type table<string, ReviewComment[]>
 local cache = {}
+---@type table<string, number> mtime (ns) of the comments file when it was last read/written
+local mtimes = {}
 
 local function file_path(root)
   return root .. "/" .. M.FILENAME
+end
+
+---@param root string
+---@return number? mtime in ns, nil if the file does not exist
+local function file_mtime(root)
+  local st = vim.uv.fs_stat(file_path(root))
+  return st and (st.mtime.sec * 1e9 + st.mtime.nsec) or nil
 end
 
 local function now()
@@ -37,6 +46,7 @@ function M.load(root)
     return cache[root]
   end
   local comments = {}
+  mtimes[root] = file_mtime(root)
   local f = io.open(file_path(root), "r")
   if f then
     local content = f:read("*a")
@@ -78,6 +88,7 @@ function M.save(root)
   if not ok then
     vim.notify("review_comments: failed to write " .. file_path(root) .. ": " .. tostring(err), vim.log.levels.ERROR)
   end
+  mtimes[root] = file_mtime(root)
 end
 
 ---@param root string
@@ -164,9 +175,25 @@ end
 function M.invalidate(root)
   if root then
     cache[root] = nil
+    mtimes[root] = nil
   else
     cache = {}
+    mtimes = {}
   end
+end
+
+--- Roots whose comments files were modified on disk since we last read/wrote them.
+--- The stale cache entries are dropped, so the next load() re-reads the file.
+---@return string[]
+function M.reload_changed()
+  local changed = {}
+  for root in pairs(cache) do
+    if file_mtime(root) ~= mtimes[root] then
+      M.invalidate(root)
+      changed[#changed + 1] = root
+    end
+  end
+  return changed
 end
 
 return M

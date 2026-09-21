@@ -44,6 +44,25 @@ local function refresh_path(root, path)
   end
 end
 
+--- Re-render every loaded buffer of the given repo root.
+local function refresh_root(root)
+  for _, b in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(b) then
+      local info = buf.resolve(b)
+      if info and info.root == root then
+        render.render(b, info)
+      end
+    end
+  end
+end
+
+--- Pick up comments files modified outside this nvim (another instance, an agent, git checkout...).
+local function sync_external_changes()
+  for _, root in ipairs(store.reload_changed()) do
+    refresh_root(root)
+  end
+end
+
 local function schedule_refresh(bufnr)
   if timer then
     timer:stop()
@@ -338,13 +357,20 @@ function M.setup(opts)
     end,
   })
 
-  -- Reload the store when the comments file is written by something else (e.g. another nvim).
+  -- Reload the store when the comments file is edited in this nvim.
   vim.api.nvim_create_autocmd("BufWritePost", {
     group = group,
     pattern = "*/" .. store.FILENAME,
     callback = function()
       store.invalidate()
     end,
+  })
+
+  -- Poll the comments file's mtime on cheap, user-driven events so edits made by
+  -- other processes show up without a manual :ReviewComment refresh.
+  vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+    group = group,
+    callback = sync_external_changes,
   })
 
   vim.api.nvim_create_user_command("ReviewComment", function(opts)
