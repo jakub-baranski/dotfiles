@@ -22,6 +22,10 @@ if [ "$1" = "--help-text" ]; then
   exit 0
 fi
 
+# Hides window-mute.sh stash sessions; exported for the re-exec'd bindings.
+NOT_MUTED='#{!:#{m:_muted_*,#{session_name}}}'
+export NOT_MUTED
+
 # Single timestamp for the whole listing, exported for relative_time calls
 # inside re-exec'd bindings.
 NOW=$(date +%s)
@@ -50,7 +54,7 @@ relative_time() {
 export -f relative_time
 
 get_sessions() {
-  tmux list-sessions -F '#{session_last_attached}|#{session_name}|#{session_id}|#{@session_color}|#{?session_attached,●,○}' | sort -rn
+  tmux list-sessions -f "$NOT_MUTED" -F '#{session_last_attached}|#{session_name}|#{session_id}|#{@session_color}|#{?session_attached,●,○}' | sort -rn
 }
 
 # Per-session agent counts (agent-status.sh --all), computed in the background
@@ -110,7 +114,7 @@ format_sessions() {
 
 # ctrl-x: multi-select kill via a second fzf with --multi.
 kill_binding="ctrl-x:become(
-  selections=\$(tmux list-sessions -F '#{session_last_attached}|#{session_name}|#{session_id}|#{?session_attached,●,○}' | sort -rn |
+  selections=\$(tmux list-sessions -f \"\$NOT_MUTED\" -F '#{session_last_attached}|#{session_name}|#{session_id}|#{?session_attached,●,○}' | sort -rn |
     while IFS='|' read -r epoch name id indicator; do
       age=\$(relative_time \"\$epoch\")
       printf '%s\t%-30s %-10s %s\n' \"\$id\" \"\$name\" \"\$age\" \"\$indicator\"
@@ -192,7 +196,7 @@ help_binding="f1:transform:
   fi"
 
 switch_previous_binding="ctrl-p:become(
-  previous=\$(tmux list-sessions -F '#{session_last_attached}|#{session_id}' |
+  previous=\$(tmux list-sessions -f \"\$NOT_MUTED\" -F '#{session_last_attached}|#{session_id}' |
     sort -rn | sed -n '2p' | cut -d'|' -f2)
   [ -n \"\$previous\" ] && tmux switch-client -t \"\$previous\"
 )"

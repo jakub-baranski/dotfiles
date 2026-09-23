@@ -94,13 +94,14 @@ pane_busy() {
 # --waiting skips the ps walk and only captures the flagged panes, because
 # it runs every status-interval from status-right. It counts flagged,
 # non-busy panes in other sessions (the current one shows them on its
-# window tabs) and prunes markers whose pane is gone. The busy check keeps
+# window tabs) outside window-mute.sh stashes, and prunes markers whose
+# pane is gone. The busy check keeps
 # it in step with what the tabs and the switcher show.
 if [ "$TARGET" = "--waiting" ]; then
   all_panes=$(tmux list-panes -a -F "$PANE_FMT" 2>/dev/null)
   candidates=$(printf '%s\n' "$all_panes" | awk -F'|' -v cur="$2" -v dir="$WAIT_DIR" '
     { visible = '"$VISIBLE_AWK"' }
-    $3 != cur && !visible && ($7 || (getline junk < (dir "/" $1)) >= 0) { print $1 }')
+    $3 != cur && $3 !~ /^_muted_/ && !visible && ($7 || (getline junk < (dir "/" $1)) >= 0) { print $1 }')
   count=0
   for pane in $candidates; do
     pane_busy "$(pane_bottom "$pane")" || count=$((count + 1))

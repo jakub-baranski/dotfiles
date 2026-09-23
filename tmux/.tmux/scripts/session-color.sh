@@ -35,6 +35,8 @@ lighten() {
 
 assign() {
   local name=$1 color
+  # window-mute.sh stash sessions never show a status bar.
+  case $name in _muted_*) return 0 ;; esac
   color=$(tmux show-options -t "$name" -qv @session_color 2>/dev/null)
   if [ -z "$color" ]; then
     local sum=0 i
